@@ -12,6 +12,8 @@ public class Client {
 	private Scanner stdin;
 	private String username;
 	private String password;
+	private boolean loggedIn = false;
+	private String userLoggedIn;
 	
 	public Client(){} // Null Constructor
 	
@@ -43,33 +45,52 @@ public class Client {
 			do
 			{
 				try
-				{					
+				{	
 					message = (String)in.readObject();
 					sendMessage(message);
-					System.out.println("\nWelcome\nTo connect to the server please enter your credentials\n");
-					
-					try {
-						System.out.println("USERNAME:");
-						username = stdin.next();
-					} catch (Exception e) {
-						System.out.println("String required");
+					System.out.println("\nWelcome\nPlease Enter your credentials\n");	
+						
+					while(!loggedIn){
+						try {
+							System.out.println("|----------|");
+							System.out.println("| USERNAME |");
+							System.out.println("|----------|");
+							username = stdin.next();
+						} catch (Exception e) {
+							System.out.println("String required");
+						}
+						
+						try {
+							System.out.println("|----------|");
+							System.out.println("| PASSWORD |");
+							System.out.println("|----------|");
+							password = stdin.next();
+						} catch (Exception e) {
+							System.out.println("Integer required");
+						}
+						
+						sendLoginDetails(username, password);
+						sendMessage(message);
+						
+						message = (String)in.readObject();
+						
+						if(message.contains("successful")){
+							loggedIn = true;
+							System.out.println("User: " + username + " now logged in");
+							userMenu();
+						}
+						else{
+							System.out.println("User Not recognised\n");
+							loggedIn = false;
+						}
 					}
-					
-					try {
-						System.out.println("PASSWORD");
-						password = stdin.next();
-					} catch (Exception e) {
-						System.out.println("Integer required");
-					}
-					
-					sendLoginDetails(username, password);
-					sendMessage(message);
 				}
 				catch(ClassNotFoundException classNot)
 				{
 					System.err.println("data received in unknown format");
 				}
 			}while(!message.equals("bye"));
+			
 		}
 		catch(UnknownHostException unknownHost)
 		{
@@ -110,16 +131,55 @@ public class Client {
 	}
 	
 	
-	public void sendLoginDetails(String userName, String password){
+	public void sendLoginDetails(String username, String password){
 		try 
 		{
-			out.writeObject(userName);
+			out.writeObject(username);
 			out.writeObject(password);
 			out.flush();
-			System.out.println("client>" + userName + " " + password);
+			// System.out.println("client>" + username + " " + password);
 		}
 		catch(IOException ioException){
 			ioException.printStackTrace();
 		}
+	}
+	
+	public void sendLoggedIn(boolean loggedIn){
+    	try {
+			out.writeObject(loggedIn);
+			out.flush();
+			// System.out.println("Server>" + loggedIn);
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+    }
+	
+	public int userMenu(){
+		System.out.println("Menu options:\n1:Copy File from Server\n2:Move a File to the Server\n"
+				+ "3:List all Files in the Directory");
+		
+		Scanner input = new Scanner(System.in);
+		int choice = input.nextInt();
+		
+		switch(choice){
+			case 1:
+				System.out.println("Case 1");
+				break;
+			case 2:
+				System.out.println("Case 1");
+				break;
+			case 3:
+				System.out.println("List Files in the Directory");
+				break;
+			case 4:
+				System.out.println("Case 1");
+				break;
+			default:
+				System.out.println("Please enter a valid choice");
+				break;
+		}		
+		input.close();
+		return choice;
 	}
 }

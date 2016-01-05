@@ -7,7 +7,12 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 
 
 public class EchoServer {
@@ -39,10 +44,10 @@ class ClientServiceThread extends Thread
 	  private boolean running = true;
 	  private ObjectOutputStream out;
 	  private ObjectInputStream in;
-	  private Map<String, Integer> map;
+	  private Map<String, Integer> map = new HashMap<String, Integer>();
 	  private AuthenticationParser ap;
-	  private boolean loggedIn;
-	  int passToString;
+	  private boolean loggedIn = false;
+	  private int passToString;
 	
 	  
 	  // Constructor
@@ -58,20 +63,30 @@ class ClientServiceThread extends Thread
 			try{
 				out.writeObject(msg); // 
 				out.flush();
-				System.out.println("client> " + msg); // Print out to the screen
+				// System.out.println("client> " + msg); // Print out to the screen
 			}
 			catch(IOException ioException){
 				ioException.printStackTrace();
 			}
 		}
 	    
-		public void sendLoginDetails(String userName, String password){
+	    public void sendLoggedIn(boolean loggedIn){
+	    	try {
+				out.writeObject(loggedIn);
+				out.flush();
+				// System.out.println("client>" + loggedIn);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+	    }
+	    
+		public void sendLoginDetails(String username, int password){
 			try 
 			{
-				out.writeObject(userName);
+				out.writeObject(username);
 				out.writeObject(password);
 				out.flush();
-				System.out.println("client> " + userName + " " + password); // Print out to the screen
+				// System.out.println("client> " + username + " " + password); // Print out to the screen
 			}
 			catch(IOException ioException){
 				ioException.printStackTrace();
@@ -95,40 +110,30 @@ class ClientServiceThread extends Thread
 				try
 				{
 					ap = new AuthenticationParser();
-					ap.parse(loggedIn);
+					ap.parse(map, loggedIn);
 					
+					// Reading in the Objects that are coming across the internet				
 					message = (String)in.readObject();
-					username = (String)in.readObject(); // Reading in the message thats coming across the internet
-					password = (String)in.readObject(); // Reading in the message thats coming across the internet
+					username = (String)in.readObject(); 
+					password = (String)in.readObject(); 
+
+					Integer passwordToInt = Integer.valueOf(password);
 					
-					int passToString = Integer.parseInt(password);
-					
-					for(Map.Entry<String, Integer> entry: map.entrySet()) {
+					for(Map.Entry<String, Integer> entry: map.entrySet()) 
+					{
 						String key = entry.getKey();
 						Integer value = entry.getValue();
 						
-						if(key.equals(username) && value == passToString){
-							System.out.println("Welcome " + username);
+						if( (key.equals(username)) && (value.equals(passwordToInt) ) )
+						{
 							sendMessage("Authentication successful, Welcome " + username);
 							loggedIn = true;
 						}
 					}
 					if(!loggedIn)
-						System.out.println("User not recognised");
+					{
 						sendMessage("User not recognised");
-					
-					
-					
-					// System.out.println("client>"+clientID+"  " + message);
-					
-					
-					
-					// sendLoginDetails(userName, password);
-					// sendMessage(message);
-					
-					// System.out.println("\n");
-					
-				    // System.out.println("client>" + userName + " " +  password);
+					}
 					
 				}
 				catch(ClassNotFoundException classnot){
