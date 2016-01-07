@@ -51,7 +51,8 @@ public class Client {
 					sendMessage(message);
 					System.out.println("\nWelcome\nPlease Enter your credentials\n");	
 						
-					while(!loggedIn){
+					do
+					{
 						try {
 							System.out.println("|----------|");
 							System.out.println("| USERNAME |");
@@ -66,31 +67,50 @@ public class Client {
 							System.out.println("| PASSWORD |");
 							System.out.println("|----------|");
 							password = stdin.next();
+							
+							sendLoginDetails(username, password);
+							message = (String)in.readObject();
+							
+							if(message.contains("successful")){
+								loggedIn = true;
+								System.out.println("\nUser [" + username + "] now logged in\n");
+								
+								do {
+									System.out.println(
+											"\nMenu options:\n1:Copy File from Server\n2:Move a File to the Server\n"
+										  + "3:List all Files in the Directory\n4:Move Directory\n5:Make a new Directory\n6:Exit");
+									
+									Scanner input = new Scanner(System.in);
+									choice = input.nextInt();
+									String choiceTxt = Integer.toString(choice);
+									sendMessage(choiceTxt);
+									message = (String) in.readObject();
+									System.out.println(message);
+									message = (String) in.readObject();
+									System.out.println(message);
+									
+									
+									
+									message = "exit";
+									System.out.println("Logged Out");
+									System.exit(0);
+									input.close();
+									
+								} while (choice != 6);
+								
+								in.close();
+							}
+							else{
+								System.out.println("User Not recognised\n");
+								loggedIn = false;
+							}
+							
 						} catch (Exception e) {
 							System.out.println("Integer required");
 						}
 						
-						sendLoginDetails(username, password);
-						
-						message = (String)in.readObject();
-						
-						if(message.contains("successful")){
-							loggedIn = true;
-							System.out.println("\nUser [" + username + "] now logged in\n");
-							
-							choice = userMenu();	
-							
-							String choiceTxt = Integer.toString(choice);
-							sendMessage(choiceTxt);
-							message = (String)in.readObject();
-							sendMessage(message);
-							System.out.println(message);
-						}
-						else{
-							System.out.println("User Not recognised\n");
-							loggedIn = false;
-						}
-					}
+					}while(!loggedIn); // End do while
+					
 				}
 				catch(ClassNotFoundException classNot)
 				{
@@ -122,7 +142,6 @@ public class Client {
 			}
 		}
 	}
-	
 	
 	public void sendMessage(String msg)
 	{
@@ -174,13 +193,13 @@ public class Client {
 				System.out.println("Case 1");
 				break;
 			case 2:
-				System.out.println("Case 1");
+				System.out.println("Case 2");
 				break;
 			case 3:
-				System.out.println("List Files in the Directory");
+				System.out.println("Users Directory");
 				break;
 			case 4:
-				System.out.println("Case 1");
+				System.out.println("Case 4");
 				break;
 			case 5:
 				System.out.println("User Logged Out");

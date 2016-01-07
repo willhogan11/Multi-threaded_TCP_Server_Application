@@ -7,12 +7,16 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Scanner;
 import java.util.Map.Entry;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 
 public class EchoServer {
@@ -48,6 +52,11 @@ class ClientServiceThread extends Thread
 	  private AuthenticationParser ap;
 	  private boolean loggedIn = false;
 	  private int passToString;
+	  private String currentDirectory;
+	  private String usersURL = "";
+  	  private FileClass fileClass = new FileClass();
+  	  private Path rootURL = Paths.get("C:\\Users\\william\\Desktop\\ProjectUsers\\");
+  	  private String str;
 	
 	  
 	  // Constructor
@@ -133,15 +142,52 @@ class ClientServiceThread extends Thread
 							
 							Integer choiceToInt = Integer.valueOf(message);
 							
-							sendMessage(message);
+							String resultOutput = ("\nCurrent Directory is: " + usersURL + "\nContents of User " + username + "'s folder:");
+							String file = "";
 							
-							FileClass file = new FileClass();
-							file.listDirectory(username);
-							
-							sendMessage(file); // How to send File to Client?
-							
-							message = (String)in.readObject();
-							sendMessage("Here is the file: " + file);
+					    	// do{
+						    	switch(choiceToInt){
+							    	case 1:
+							    		
+							    	case 2:
+							    		fileClass.makeDirectory();
+							    		break;
+							    	case 3:
+							    		if(username.equals("will")){
+							    			usersURL = ("Current Directory is: " + rootURL + "\\" + username);
+							    			sendMessage(usersURL);
+							    		    file = fileClass.listDirectory(username, str);
+							    		    sendMessage("List of Files in this directory: " + file);
+							    		}
+							    		else if(username.equals("mike")){
+							    			usersURL = ("Current Directory is: " + rootURL + "\\" + username);
+							    			sendMessage(usersURL);
+							    		    file = fileClass.listDirectory(username, str);
+							    		    sendMessage("\nList of Files in this directory: " + file);
+							    		}
+							    		else if(username.equals("mark")){
+							    			usersURL = ("Current Directory is: " + rootURL + "\\" + username);
+							    			sendMessage(usersURL);
+							    		    file = fileClass.listDirectory(username, str);
+							    		    sendMessage("\nList of Files in this directory: " + file);
+							    		}
+							    		else if(username.equals("john")){
+							    			usersURL = ("Current Directory is: " + rootURL + "\\" + username);
+							    			sendMessage(usersURL);
+							    		    file = fileClass.listDirectory(username, str);
+							    		    sendMessage("\nList of Files in this directory: " + file);
+							    		}
+							    		break;
+
+							    	case 4:
+							    		break;
+							    	case 5:
+							    		System.exit(0);
+							    		break;
+									default:
+										System.out.println("Enter valid number");
+						    	}
+					    	// }while(choiceToInt != 5);
 							
 							message = (String)in.readObject();
 							

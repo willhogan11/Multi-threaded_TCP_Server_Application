@@ -3,13 +3,14 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.Arrays;
 import java.util.Scanner;
 
 import com.sun.org.apache.xerces.internal.util.SynchronizedSymbolTable;
 
 public class FileClass {
  
-    public static void main(String[] args) {
+  /*  public static void main(String[] args) {
     	
     	String username = "";
     	String usersURL = "";
@@ -23,31 +24,31 @@ public class FileClass {
     	Scanner input = new Scanner(System.in);
     	System.out.println("1:List Directory\n2:Make Directory\n3:Copy File\n4:Exit");
     	int choice = input.nextInt();
+    	System.out.println("\nEnter your Username");
+    	username = input.next();
     	
-    	do{
+    	
+    	//do{
 	    	switch(choice){
 		    	case 1:
-		    		System.out.println("Enter your Username");
-		    		username = input.next();
-		    		
 		    		if(username.equals("will")){
 		    			usersURL = (url + "\\" + username);
-		    			System.out.println("Current Directory is: " + usersURL + "\nContents of User " + username + "'s folder:");
+		    			System.out.println("\nCurrent Directory is: " + usersURL + "\nContents of User " + username + "'s folder:");
 		    			fileClass.listDirectory(username);
 		    		}
 		    		else if(username.equals("mike")){
 		    			usersURL = (url + "\\" + username);
-		    			System.out.println("Current Directory is: " + usersURL + "\nContents of User " + username + "'s folder:");
+		    			System.out.println("\nCurrent Directory is: " + usersURL + "\nContents of User " + username + "'s folder:");
 		    			fileClass.listDirectory(username);
 		    		}
 		    		else if(username.equals("mark")){
 		    			usersURL = (url + "\\" + username);
-		    			System.out.println("Current Directory is: " + usersURL + "\nContents of User " + username + "'s folder:");
+		    			System.out.println("\nCurrent Directory is: " + usersURL + "\nContents of User " + username + "'s folder:");
 		    			fileClass.listDirectory(username);
 		    		}
 		    		else if(username.equals("john")){
 		    			usersURL = (url + "\\" + username);
-		    			System.out.println("Current Directory is: " + usersURL + "\nContents of User " + username + "'s folder:");
+		    			System.out.println("\nCurrent Directory is: " + usersURL + "\nContents of User " + username + "'s folder:");
 		    			fileClass.listDirectory(username);
 		    		}
 		    		break;
@@ -63,26 +64,23 @@ public class FileClass {
 				default:
 					System.out.println("Enter valid number");
 	    	}
-    	}while(!username.equals("exit"));
+    	//}while(!username.equals("exit"));
     	
     	System.out.println("User Logged Out");
     	input.close();
     }
-    
-    public File listDirectory(String username){
+    */
+   
+	public String listDirectory(String username, String str){
 
     	String usersURL = "";
      	File usersDirectory = new File("C:/Users/william/Desktop/ProjectUsers/" + username);
-     	Path url = Paths.get("C:/Users/william/Desktop/ProjectUsers/");
-    	String[] str = usersDirectory.list();
-    	usersURL = (url + "\\" + username);
-    	
-    	System.out.println("\nCurrent Directory is: " + usersURL + "\nContents of User " + username + "'s folder:");
-    	
-    	for (String string : str) {
-			System.out.println(string);
-		}
-		return usersDirectory;
+     	Path rootURL = Paths.get("C:/Users/william/Desktop/ProjectUsers/");
+    	str = Arrays.toString(usersDirectory.list());
+    	usersURL = (rootURL + "\\" + username);
+		System.out.println(str);
+		
+		return str;
     }    
     
     public File makeDirectory(){
