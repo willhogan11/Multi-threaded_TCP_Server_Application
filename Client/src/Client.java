@@ -14,6 +14,7 @@ public class Client {
 	private String password;
 	private boolean loggedIn = false;
 	private String userLoggedIn;
+	private int choice;
 	
 	public Client(){} // Null Constructor
 	
@@ -70,14 +71,20 @@ public class Client {
 						}
 						
 						sendLoginDetails(username, password);
-						sendMessage(message);
 						
 						message = (String)in.readObject();
 						
 						if(message.contains("successful")){
 							loggedIn = true;
-							System.out.println("User: " + username + " now logged in");
-							userMenu();
+							System.out.println("\nUser [" + username + "] now logged in\n");
+							
+							choice = userMenu();	
+							
+							String choiceTxt = Integer.toString(choice);
+							sendMessage(choiceTxt);
+							message = (String)in.readObject();
+							sendMessage(message);
+							System.out.println(message);
 						}
 						else{
 							System.out.println("User Not recognised\n");
@@ -89,7 +96,7 @@ public class Client {
 				{
 					System.err.println("data received in unknown format");
 				}
-			}while(!message.equals("bye"));
+			}while(!message.equals("exit"));
 			
 		}
 		catch(UnknownHostException unknownHost)
@@ -157,10 +164,10 @@ public class Client {
 	
 	public int userMenu(){
 		System.out.println("Menu options:\n1:Copy File from Server\n2:Move a File to the Server\n"
-				+ "3:List all Files in the Directory");
+				+ "3:List all Files in the Directory\n4:Move Directory\n5:Exit");
 		
 		Scanner input = new Scanner(System.in);
-		int choice = input.nextInt();
+		choice = input.nextInt();
 		
 		switch(choice){
 			case 1:
@@ -174,6 +181,10 @@ public class Client {
 				break;
 			case 4:
 				System.out.println("Case 1");
+				break;
+			case 5:
+				System.out.println("User Logged Out");
+				System.exit(0);
 				break;
 			default:
 				System.out.println("Please enter a valid choice");

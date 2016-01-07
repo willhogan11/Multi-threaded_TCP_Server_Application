@@ -63,7 +63,7 @@ class ClientServiceThread extends Thread
 			try{
 				out.writeObject(msg); // 
 				out.flush();
-				// System.out.println("client> " + msg); // Print out to the screen
+				System.out.println("Server> " + msg); // Print out to the screen
 			}
 			catch(IOException ioException){
 				ioException.printStackTrace();
@@ -116,7 +116,7 @@ class ClientServiceThread extends Thread
 					message = (String)in.readObject();
 					username = (String)in.readObject(); 
 					password = (String)in.readObject(); 
-
+					
 					Integer passwordToInt = Integer.valueOf(password);
 					
 					for(Map.Entry<String, Integer> entry: map.entrySet()) 
@@ -126,8 +126,25 @@ class ClientServiceThread extends Thread
 						
 						if( (key.equals(username)) && (value.equals(passwordToInt) ) )
 						{
-							sendMessage("Authentication successful, Welcome " + username);
+							sendMessage("Authentication successful for user " + username);
 							loggedIn = true;
+							
+							message = (String)in.readObject();
+							
+							Integer choiceToInt = Integer.valueOf(message);
+							
+							sendMessage(message);
+							
+							FileClass file = new FileClass();
+							file.listDirectory(username);
+							
+							sendMessage(file); // How to send File to Client?
+							
+							message = (String)in.readObject();
+							sendMessage("Here is the file: " + file);
+							
+							message = (String)in.readObject();
+							
 						}
 					}
 					if(!loggedIn)
@@ -147,4 +164,9 @@ class ClientServiceThread extends Thread
 	      e.printStackTrace();
 	    }
 	  }
+
+
+	public void sendMessage(FileClass file) {
+		
+	}
 }

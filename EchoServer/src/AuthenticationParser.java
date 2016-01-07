@@ -16,7 +16,7 @@ public class AuthenticationParser {
 	private static boolean loggedIn = false;
 	private static Scanner input;
 	
-	public static void main(String[] args) throws Exception {
+/*	public static void main(String[] args) throws Exception {
 		
 		AuthenticationParser ap = new AuthenticationParser();
 		ap.parse(map, loggedIn);
@@ -43,7 +43,7 @@ public class AuthenticationParser {
 		{
 			System.out.println("User not recognised");
 		}
-	}
+	}*/
 	
 	/*public static void main(String[] args) throws Exception {
 		
