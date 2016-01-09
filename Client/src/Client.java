@@ -1,5 +1,8 @@
 import java.io.*;
 import java.net.*;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.Scanner;
 
 public class Client {
@@ -47,53 +50,68 @@ public class Client {
 			{
 				try
 				{	
-					message = (String)in.readObject();
-					sendMessage(message);
-					System.out.println("\nWelcome\nPlease Enter your credentials\n");	
-						
+					message = (String)in.readObject();// Receive incoming Object and cast to a String
+					sendMessage(message); // Sent the received message to the Server
+					System.out.println("\nWelcome\nPlease Enter your credentials\n"); // Authentication	
+					
 					do
 					{
 						try {
 							System.out.println("|----------|");
 							System.out.println("| USERNAME |");
 							System.out.println("|----------|");
-							username = stdin.next();
+							username = stdin.next(); // Takes in Username
+							
 						} catch (Exception e) {
-							System.out.println("String required");
+							System.out.println("String required"); // Catches any exception
 						}
 						
 						try {
 							System.out.println("|----------|");
 							System.out.println("| PASSWORD |");
 							System.out.println("|----------|");
-							password = stdin.next();
+							password = stdin.next(); // Takes in Password
 							
-							sendLoginDetails(username, password);
+							sendLoginDetails(username, password); // Send both username & password to the Server for Authentication 
 							message = (String)in.readObject();
 							
+							// Logs the User in upon Successful Authentication
 							if(message.contains("successful")){
 								loggedIn = true;
-								System.out.println("\nUser [" + username + "] now logged in\n");
+								System.out.println("\nUser [" + username + "] now logged in");
 								
+								// Provide a Menu for the Client side to choose from
 								do {
 									System.out.println(
 											"\nMenu options:\n1:Copy File from Server\n2:Move a File to the Server\n"
 										  + "3:List all Files in the Directory\n4:Move Directory\n5:Make a new Directory\n6:Exit");
 									
 									Scanner input = new Scanner(System.in);
-									choice = input.nextInt();
-									String choiceTxt = Integer.toString(choice);
-									sendMessage(choiceTxt);
-									message = (String) in.readObject();
-									System.out.println(message);
-									message = (String) in.readObject();
-									System.out.println(message);
+									choice = input.nextInt(); // Saves the choice as an Integer value
+									String choiceTxt = Integer.toString(choice); // Convert to String to send to the Server
+									sendMessage(choiceTxt); // Send the choice to the server
 									
-									
-									
-									message = "exit";
-									System.out.println("Logged Out");
-									System.exit(0);
+									if(choice == 1)
+									{
+										requestFileFromServer();
+									}
+									// Choice 3 Will Display a Directory listing for that User & The Actual Directory Path
+									else if(choice == 3)
+									{
+										message = (String) in.readObject();
+										System.out.println(message);
+										message = (String) in.readObject();
+										System.out.println(message);
+									}
+									else if(choice == 5)
+									{
+										/*System.out.println(message);
+										message = (String) in.readObject();
+										System.out.println(message);*/
+									}
+									/*message = "exit";
+									System.out.println("\nLogged Out");
+									System.exit(0);*/
 									input.close();
 									
 								} while (choice != 6);
@@ -170,46 +188,42 @@ public class Client {
 		}
 	}
 	
-	public void sendLoggedIn(boolean loggedIn){
-    	try {
-			out.writeObject(loggedIn);
-			out.flush();
-			// System.out.println("Server>" + loggedIn);
+	private boolean requestFileFromServer() {
+		File file = new File(System.getProperty("user.dir") + File.separator + "Test.txt");
+		// File file = new File("C:\\Users\\william\\workspace\\EchoServer\\Test.txt");
+		if(!file.exists())
+		{
+			try(FileOutputStream fos = new FileOutputStream(file))
+			{
+				int readBits;
+				byte[] buffer = new byte[4096]; 
+				while(true)
+				{
+					readBits = in.read(buffer, 0, buffer.length);
+					if(readBits == -1){
+						break;
+					}
+					fos.write(buffer, 0, readBits);
+					System.out.println("File Request Success, See below directory");
+					listDirectory();
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 			
-		} catch (IOException e) {
-			e.printStackTrace();
 		}
-    }
-	
-	public int userMenu(){
-		System.out.println("Menu options:\n1:Copy File from Server\n2:Move a File to the Server\n"
-				+ "3:List all Files in the Directory\n4:Move Directory\n5:Exit");
-		
-		Scanner input = new Scanner(System.in);
-		choice = input.nextInt();
-		
-		switch(choice){
-			case 1:
-				System.out.println("Case 1");
-				break;
-			case 2:
-				System.out.println("Case 2");
-				break;
-			case 3:
-				System.out.println("Users Directory");
-				break;
-			case 4:
-				System.out.println("Case 4");
-				break;
-			case 5:
-				System.out.println("User Logged Out");
-				System.exit(0);
-				break;
-			default:
-				System.out.println("Please enter a valid choice");
-				break;
-		}		
-		input.close();
-		return choice;
+		else
+			System.err.println("File Already Exists");
+		return false;
 	}
+	
+	
+	public File listDirectory(){
+     	File usersDirectory = new File(System.getProperty("user.dir"));
+     	String[] list = (usersDirectory.list());
+     	for(String s: list)
+     		System.out.println(s);
+     	return usersDirectory;
+    }    
+
 }

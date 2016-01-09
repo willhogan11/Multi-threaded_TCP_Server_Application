@@ -9,70 +9,8 @@ import java.util.Scanner;
 import com.sun.org.apache.xerces.internal.util.SynchronizedSymbolTable;
 
 public class FileClass {
- 
-  /*  public static void main(String[] args) {
-    	
-    	String username = "";
-    	String usersURL = "";
-    	FileClass fileClass = new FileClass();
-    	
-    	// **DEBUG: Shows Root Directory for Users**
-    	// fileClass.listDirectory(username);
-    	
-    	Path url = Paths.get("C:\\Users\\william\\Desktop\\ProjectUsers\\");
-    	
-    	Scanner input = new Scanner(System.in);
-    	System.out.println("1:List Directory\n2:Make Directory\n3:Copy File\n4:Exit");
-    	int choice = input.nextInt();
-    	System.out.println("\nEnter your Username");
-    	username = input.next();
-    	
-    	
-    	//do{
-	    	switch(choice){
-		    	case 1:
-		    		if(username.equals("will")){
-		    			usersURL = (url + "\\" + username);
-		    			System.out.println("\nCurrent Directory is: " + usersURL + "\nContents of User " + username + "'s folder:");
-		    			fileClass.listDirectory(username);
-		    		}
-		    		else if(username.equals("mike")){
-		    			usersURL = (url + "\\" + username);
-		    			System.out.println("\nCurrent Directory is: " + usersURL + "\nContents of User " + username + "'s folder:");
-		    			fileClass.listDirectory(username);
-		    		}
-		    		else if(username.equals("mark")){
-		    			usersURL = (url + "\\" + username);
-		    			System.out.println("\nCurrent Directory is: " + usersURL + "\nContents of User " + username + "'s folder:");
-		    			fileClass.listDirectory(username);
-		    		}
-		    		else if(username.equals("john")){
-		    			usersURL = (url + "\\" + username);
-		    			System.out.println("\nCurrent Directory is: " + usersURL + "\nContents of User " + username + "'s folder:");
-		    			fileClass.listDirectory(username);
-		    		}
-		    		break;
-		    	case 2:
-		    		fileClass.makeDirectory();
-		    		break;
-		    	case 3:
-		    		fileClass.copyFile();
-		    		break;
-		    	case 4:
-		    		System.exit(0);
-		    		break;
-				default:
-					System.out.println("Enter valid number");
-	    	}
-    	//}while(!username.equals("exit"));
-    	
-    	System.out.println("User Logged Out");
-    	input.close();
-    }
-    */
-   
+	
 	public String listDirectory(String username, String str){
-
     	String usersURL = "";
      	File usersDirectory = new File("C:/Users/william/Desktop/ProjectUsers/" + username);
      	Path rootURL = Paths.get("C:/Users/william/Desktop/ProjectUsers/");

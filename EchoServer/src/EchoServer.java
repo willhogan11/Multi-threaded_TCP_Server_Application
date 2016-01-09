@@ -7,12 +7,16 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.Map.Entry;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -57,12 +61,16 @@ class ClientServiceThread extends Thread
   	  private FileClass fileClass = new FileClass();
   	  private Path rootURL = Paths.get("C:\\Users\\william\\Desktop\\ProjectUsers\\");
   	  private String str;
+  	  private final StringBuffer responseBuffer;
+  	  private final StringBuffer requestBuffer;
 	
 	  
 	  // Constructor
 	  public ClientServiceThread(Socket s, int i) {
 	    clientSocket = s;
 	    clientID = i;
+	    responseBuffer = new StringBuffer();
+	    requestBuffer = new StringBuffer();
 	  }
 	  
 	
@@ -70,7 +78,7 @@ class ClientServiceThread extends Thread
 	    public void sendMessage(String msg)
 		{
 			try{
-				out.writeObject(msg); // 
+				out.writeObject(msg); //(responseBuffer.toString()); responseBuffer.delete(0, responseBuffer.length()); 
 				out.flush();
 				System.out.println("Server> " + msg); // Print out to the screen
 			}
@@ -79,12 +87,23 @@ class ClientServiceThread extends Thread
 			}
 		}
 	    
-	    public void sendLoggedIn(boolean loggedIn){
+	    // Sends the stream to the client
+	    public void sendMessage(byte[] data, int length)
+		{
+			try{
+				out.write(data, 0, length); //(responseBuffer.toString()); responseBuffer.delete(0, responseBuffer.length()); 
+				out.flush(); // Print out to the screen
+			}
+			catch(IOException ioException){
+				ioException.printStackTrace();
+			}
+		}
+	    
+	    private void receiveObject(){
 	    	try {
-				out.writeObject(loggedIn);
-				out.flush();
-				// System.out.println("client>" + loggedIn);
-			} catch (IOException e) {
+	    		requestBuffer.delete(0, requestBuffer.length());// requestBuffer.toString().getBytes();
+				requestBuffer.append((String) in.readObject());
+			} catch (ClassNotFoundException | IOException e) {
 				e.printStackTrace();
 			}
 	    }
@@ -117,7 +136,7 @@ class ClientServiceThread extends Thread
 			sendMessage("Connection successful");
 			do{
 				try
-				{
+				{				
 					ap = new AuthenticationParser();
 					ap.parse(map, loggedIn);
 					
@@ -142,62 +161,62 @@ class ClientServiceThread extends Thread
 							
 							Integer choiceToInt = Integer.valueOf(message);
 							
-							String resultOutput = ("\nCurrent Directory is: " + usersURL + "\nContents of User " + username + "'s folder:");
 							String file = "";
-							
 					    	// do{
 						    	switch(choiceToInt){
-							    	case 1:
-							    		
-							    	case 2:
-							    		fileClass.makeDirectory();
+							    	case 1: // Copy File from Server
+							    		sendRequestedFileToClient();
 							    		break;
-							    	case 3:
-							    		if(username.equals("will")){
-							    			usersURL = ("Current Directory is: " + rootURL + "\\" + username);
-							    			sendMessage(usersURL);
-							    		    file = fileClass.listDirectory(username, str);
-							    		    sendMessage("List of Files in this directory: " + file);
-							    		}
-							    		else if(username.equals("mike")){
-							    			usersURL = ("Current Directory is: " + rootURL + "\\" + username);
-							    			sendMessage(usersURL);
-							    		    file = fileClass.listDirectory(username, str);
-							    		    sendMessage("\nList of Files in this directory: " + file);
-							    		}
-							    		else if(username.equals("mark")){
-							    			usersURL = ("Current Directory is: " + rootURL + "\\" + username);
-							    			sendMessage(usersURL);
-							    		    file = fileClass.listDirectory(username, str);
-							    		    sendMessage("\nList of Files in this directory: " + file);
-							    		}
-							    		else if(username.equals("john")){
-							    			usersURL = ("Current Directory is: " + rootURL + "\\" + username);
-							    			sendMessage(usersURL);
-							    		    file = fileClass.listDirectory(username, str);
-							    		    sendMessage("\nList of Files in this directory: " + file);
+							    	case 2: // Move a File to the Server
+							    		break;
+							    	case 3: // List all Files in the Directory &Display Root path directory
+							    		if(choiceToInt == 3){
+								    		if(username.equals("will")){
+								    			usersURL = ("\nCurrent Directory is: " + rootURL + "\\" + username);
+								    			sendMessage(usersURL);
+								    		    file = fileClass.listDirectory(username, str);
+								    		    sendMessage("List of Files in this directory: " + file);
+								    		}
+								    		else if(username.equals("mike")){
+								    			usersURL = ("Current Directory is: " + rootURL + "\\" + username);
+								    			sendMessage(usersURL);
+								    		    file = fileClass.listDirectory(username, str);
+								    		    sendMessage("\nList of Files in this directory: " + file);
+								    		}
+								    		else if(username.equals("mark")){
+								    			usersURL = ("Current Directory is: " + rootURL + "\\" + username);
+								    			sendMessage(usersURL);
+								    		    file = fileClass.listDirectory(username, str);
+								    		    sendMessage("\nList of Files in this directory: " + file);
+								    		}
+								    		else if(username.equals("john")){
+								    			usersURL = ("Current Directory is: " + rootURL + "\\" + username);
+								    			sendMessage(usersURL);
+								    		    file = fileClass.listDirectory(username, str);
+								    		    sendMessage("\nList of Files in this directory: " + file);
+								    		}
 							    		}
 							    		break;
 
-							    	case 4:
+							    	case 4: // Move Directory
 							    		break;
-							    	case 5:
+							    	case 5: // Make a new Directory
+							    		if(choiceToInt == 5){
+							    			//??		
+							    		}
+							    		break;
+							    	case 6:
 							    		System.exit(0);
 							    		break;
 									default:
 										System.out.println("Enter valid number");
 						    	}
 					    	// }while(choiceToInt != 5);
-							
-							message = (String)in.readObject();
-							
 						}
 					}
-					if(!loggedIn)
-					{
+					if(!loggedIn){
 						sendMessage("User not recognised");
 					}
-					
 				}
 				catch(ClassNotFoundException classnot){
 					System.err.println("Data received in unknown format");
@@ -211,8 +230,51 @@ class ClientServiceThread extends Thread
 	    }
 	  }
 
-
-	public void sendMessage(FileClass file) {
-		
-	}
+	  private synchronized boolean uploadFile(String msg) {
+			//identify and validate the request
+			// get file_name.pdf
+			ArrayList<String> command = new ArrayList<>(Arrays.asList(msg.split(" ")));
+			//if valid
+			if(command.get(0).equals("get")){
+				File file = new File(System.getProperty("user.dir") + File.separator + command.get(1));
+				// File file = new File("C:\\Users\\william\\Desktop\\ProjectUsers\\" + username);
+				if(file.exists() &&  file.isFile()){
+					try(FileOutputStream fos = new FileOutputStream(file)){
+						int readBits;
+						byte[] buffer = new byte[4096]; 
+						while(true){
+							readBits = in.read(buffer, 0, buffer.length);
+							if(readBits == -1){
+								break;
+							}
+							fos.write(buffer, 0, readBits);
+						}
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+			return false;
+				//create file pointer
+	  }	
+	  
+	  private synchronized boolean sendRequestedFileToClient() {
+			File file = new File(System.getProperty("user.dir") + File.separator + "Test.txt");
+			if(file.exists() &&  file.isFile()){
+				try(FileInputStream fis = new FileInputStream(file)){
+					int readBits;
+					byte[] buffer = new byte[4096]; 
+					while(true){
+						readBits = fis.read(buffer, 0, buffer.length);
+						if(readBits == -1){
+							break;
+						}
+						sendMessage(buffer, readBits);
+					}
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+			return false;
+	  }
 }
