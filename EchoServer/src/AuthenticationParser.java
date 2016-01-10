@@ -1,4 +1,5 @@
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.util.HashMap;
@@ -9,7 +10,8 @@ import java.util.Scanner;
 public class AuthenticationParser {
 	
 	private static Map<String, Integer> map = new HashMap<String, Integer>();
-	private static final String CREDENTIALS = "C:/Users/william/Desktop/ProjectUsers/credentials.txt";
+	// private static final String CREDENTIALS = "C:/Users/william/Desktop/ProjectUsers/credentials.txt";
+	private static final String CREDENTIALS = (System.getProperty("user.dir") + File.separator + "credentials.txt");
 	private String line;
 	private static String userName;
 	private static int password;

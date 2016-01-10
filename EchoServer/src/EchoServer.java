@@ -44,6 +44,7 @@ public class EchoServer {
 
 class ClientServiceThread extends Thread 
 {
+	  // Instance Variables
 	  private Socket clientSocket;
 	  private String message;
 	  private String username;
@@ -69,8 +70,8 @@ class ClientServiceThread extends Thread
 	  public ClientServiceThread(Socket s, int i) {
 	    clientSocket = s;
 	    clientID = i;
-	    responseBuffer = new StringBuffer();
-	    requestBuffer = new StringBuffer();
+	    responseBuffer = new StringBuffer(); //  new buffer object declaration
+	    requestBuffer = new StringBuffer(); // new buffer object declaration
 	  }
 	  
 	
@@ -114,7 +115,6 @@ class ClientServiceThread extends Thread
 				out.writeObject(username);
 				out.writeObject(password);
 				out.flush();
-				// System.out.println("client> " + username + " " + password); // Print out to the screen
 			}
 			catch(IOException ioException){
 				ioException.printStackTrace();
@@ -137,6 +137,7 @@ class ClientServiceThread extends Thread
 			do{
 				try
 				{				
+					// Populate the HashMap with credentials in Key Valuie pair format
 					ap = new AuthenticationParser();
 					ap.parse(map, loggedIn);
 					
@@ -147,6 +148,7 @@ class ClientServiceThread extends Thread
 					
 					Integer passwordToInt = Integer.valueOf(password);
 					
+					// Checks the HashMap against the users input, client side and either logs the user in, or blocks the request
 					for(Map.Entry<String, Integer> entry: map.entrySet()) 
 					{
 						String key = entry.getKey();
@@ -156,11 +158,8 @@ class ClientServiceThread extends Thread
 						{
 							sendMessage("Authentication successful for user " + username);
 							loggedIn = true;
-							
 							message = (String)in.readObject();
-							
 							Integer choiceToInt = Integer.valueOf(message);
-							
 							String file = "";
 					    	// do{
 						    	switch(choiceToInt){
@@ -168,8 +167,9 @@ class ClientServiceThread extends Thread
 							    		sendRequestedFileToClient();
 							    		break;
 							    	case 2: // Move a File to the Server
+							    		receiveFileFromClient();
 							    		break;
-							    	case 3: // List all Files in the Directory &Display Root path directory
+							    	case 3: // List all Files in the Directory & Display Root path directory, depending on the user that's logged in
 							    		if(choiceToInt == 3){
 								    		if(username.equals("will")){
 								    			usersURL = ("\nCurrent Directory is: " + rootURL + "\\" + username);
@@ -199,19 +199,20 @@ class ClientServiceThread extends Thread
 							    		break;
 
 							    	case 4: // Move Directory
+							    		// Not Implemented
 							    		break;
 							    	case 5: // Make a new Directory
 							    		if(choiceToInt == 5){
-							    			//??		
+							    			fileClass.makeDirectory(username);	
+							    			sendMessage("Directory successfully created");
 							    		}
 							    		break;
 							    	case 6:
-							    		System.exit(0);
+							    		System.exit(0); // Exit
 							    		break;
 									default:
 										System.out.println("Enter valid number");
 						    	}
-					    	// }while(choiceToInt != 5);
 						}
 					}
 					if(!loggedIn){
@@ -230,34 +231,7 @@ class ClientServiceThread extends Thread
 	    }
 	  }
 
-	  private synchronized boolean uploadFile(String msg) {
-			//identify and validate the request
-			// get file_name.pdf
-			ArrayList<String> command = new ArrayList<>(Arrays.asList(msg.split(" ")));
-			//if valid
-			if(command.get(0).equals("get")){
-				File file = new File(System.getProperty("user.dir") + File.separator + command.get(1));
-				// File file = new File("C:\\Users\\william\\Desktop\\ProjectUsers\\" + username);
-				if(file.exists() &&  file.isFile()){
-					try(FileOutputStream fos = new FileOutputStream(file)){
-						int readBits;
-						byte[] buffer = new byte[4096]; 
-						while(true){
-							readBits = in.read(buffer, 0, buffer.length);
-							if(readBits == -1){
-								break;
-							}
-							fos.write(buffer, 0, readBits);
-						}
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
-				}
-			}
-			return false;
-				//create file pointer
-	  }	
-	  
+	  // Receives request from the Client for a file and send the user the file, named Test.txt, again statically declared
 	  private synchronized boolean sendRequestedFileToClient() {
 			File file = new File(System.getProperty("user.dir") + File.separator + "Test.txt");
 			if(file.exists() &&  file.isFile()){
@@ -274,7 +248,35 @@ class ClientServiceThread extends Thread
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
-			}
+			}	
 			return false;
 	  }
+	  
+	  // Receives a file sent by the client and places the file into the specified user's folder
+	  private boolean receiveFileFromClient() {
+			File file = new File(System.getProperty("user.dir") + File.separator + "ProjectUsers\\" + username + File.separator + "FileToUploadToServer.txt");
+			if(!file.exists())
+			{
+				try(FileOutputStream fos = new FileOutputStream(file))
+				{
+					int readBits;
+					byte[] buffer = new byte[4096]; 
+					while(true)
+					{
+						readBits = in.read(buffer, 0, buffer.length);
+						if(readBits == -1){
+							break;
+						}
+						fos.write(buffer, 0, readBits);
+						String fileList = fileClass.listDirectory(username, str);
+		    		    sendMessage("\n\nFile Request Success, See below directory:\n " + fileList);
+					}
+				} catch (IOException e) {
+					e.printStackTrace();
+				}	
+			}
+			else
+				sendMessage("File Already Exists");
+			return false;
+		}
 }
